@@ -18,7 +18,7 @@ func TestHttpServer(t *testing.T) {
 
 func httpRegister() {
 	//无action接口，请求时不能有action字段，或action="-"
-	RegisterServer("api/getuserinfo", "-", "POST", handleGetUserInfo) //注册请求路径为"api/test"的服务
+	RegisterServer("api/getuserinfo", PathNoAction, "POST", handleGetUserInfo) //注册请求路径为"api/test"的服务
 	/*
 		1.请求举例
 		curl http://127.0.0.1:8080/api/getuserinfo  -d '{
@@ -50,6 +50,7 @@ func httpRegister() {
 
 type GetUserInfoReq struct {
 	BaseHeader `mapstructure:",squash"`
+	UserId     string
 }
 
 type GetUserInfoRsp struct {
@@ -82,10 +83,11 @@ func handleGetUserInfo(ctx *GinContext) {
 type ModUserInfoReq struct {
 	BaseHeader `mapstructure:",squash"`
 	Action     string
+	UserId     string
 }
 
 type ModUserInfoRsp struct {
-	Userid string
+	UserId string
 }
 
 func handleModUserInfo(ctx *GinContext) {
@@ -102,7 +104,7 @@ func handleModUserInfo(ctx *GinContext) {
 	}
 
 	rsp := &ModUserInfoRsp{
-		Userid: req.UserId,
+		UserId: req.UserId,
 	}
 	ctx.SetRsp(rsp)
 }

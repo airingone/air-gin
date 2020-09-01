@@ -2,6 +2,7 @@ package air_gin
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/airingone/config"
 	"github.com/airingone/log"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,14 @@ import (
 
 var eng *gin.Engine               //gin engine
 var ginConfig config.ConfigServer //server配置，程序初始化获取一次
+
+var handlerFuncs = make(map[string]HttpHandlerFunc) //路由表
+var handlerNoAction = make(map[string]uint32)       //默认路由路径
+const (
+	PathNoAction = "-"
+)
+
+type HttpHandlerFunc func(*GinContext) //逻辑执行函数定义
 
 func InitHttp(mode string) {
 	ginConfig = config.GetServerConfig("server")
@@ -85,18 +94,22 @@ func (c *GinContext) ResponseError(errCode uint32, errMsg string) {
 	c.LogHandler.Info("Server: Response succ, rsp: %+v, errCode: %d, errMsg: %s", c.Rsp, c.ErrCode, c.ErrMsg)
 }
 
-type HttpHandlerFunc func(*GinContext)
-
-var handlerFuncs = make(map[string]HttpHandlerFunc)
-
 //注册http请求，path为url路径，action为路由参数，为"-"则表示无路由
-func RegisterServer(path string, action string, methods string, handle HttpHandlerFunc) {
+func RegisterServer(path string, action string, methods string, handle HttpHandlerFunc) error {
 	if len(path) < 1 {
-		return
+		return errors.New("Path err")
 	}
 	if path[0] != '/' {
 		path = "/" + path
 	}
+
+	if len(action) < 1 {
+		return errors.New("Action err")
+	}
+	if action == PathNoAction {
+		handlerNoAction[path] = 1
+	}
+
 	handlerFuncs[path+action] = handle //注册handle处理函数
 
 	if methods == "POST" {
@@ -107,6 +120,8 @@ func RegisterServer(path string, action string, methods string, handle HttpHandl
 		eng.POST(path, Server)
 		eng.GET(path, Server)
 	}
+
+	return nil
 }
 
 //http服务入口函数
@@ -155,9 +170,16 @@ func Server(ctx *gin.Context) {
 	}
 
 	//处理请求
-	action := "-"
+	action := PathNoAction
 	if _, ok := c.Req["action"].(string); ok {
 		action = c.Req["action"].(string)
+	}
+	if action == PathNoAction {
+		if _, ok := handlerNoAction[c.Ctx.FullPath()]; !ok {
+			c.LogHandler.Info("Server: requestMs Action not support, req: %+v", c.Req)
+			c.ResponseError(100, "Server:path not support")
+			return
+		}
 	}
 	if _, ok := handlerFuncs[c.Ctx.FullPath()+action]; !ok {
 		c.LogHandler.Info("Server: requestMs Action not support, req: %+v", c.Req)
