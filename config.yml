@@ -12,3 +12,6 @@ log:
   maxBackups: 20 #file count
   maxAge: 30     #days
   compress: true
+
+etcd:
+  addrs: ["127.0.0.1:2380"]
