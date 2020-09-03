@@ -11,13 +11,8 @@ import (
 func TestHttpServer(t *testing.T) {
 	config.InitConfig()                     //配置文件初始化
 	log.InitLog(config.GetLogConfig("log")) //日志初始化
-	var addrs []string
-	addrs = append(addrs, "127.0.0.1:2380")
-	err := airetcd.RegisterLocalServerToEtcd(config.GetString("server.name"),
-		config.GetUInt32("server.port"), addrs /*config.GetStringSlice("etcd.addrs")*/) //将服务注册到etcd集群
-	if err != nil {
-		log.Fatal("RegisterLocalServerToEtcd failed")
-	}
+	airetcd.RegisterLocalServerToEtcd(config.GetString("server.name"),
+		config.GetUInt32("server.port"), config.GetStringSlice("etcd.addrs")) //将服务注册到etcd集群
 
 	InitHttp("release") //上线使用release模式，支持debug，release，test，即为gin的模式
 	httpRegister()
