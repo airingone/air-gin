@@ -1,5 +1,5 @@
 server:
-  name: congfig_test
+  name: gin_test
   author: airing
   version: 1.0
   port: 8080
