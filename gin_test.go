@@ -31,7 +31,7 @@ func httpRegister() {
 		}'
 
 		2.response:
-		成功：{"data":{"UserId":"user123","UserName":"user00","UserAge":20},"errCode":0,"errMsg":"succ","requestId":"123456789"}
+		成功：{"data":{"userId":"user123","UserName":"user00","UserAge":20},"errCode":0,"errMsg":"succ","requestId":"123456789"}
 		失败：{"data":null,"errCode":10001,"errMsg":"para err","requestId":"123456789"}
 	*/
 
@@ -46,7 +46,7 @@ func httpRegister() {
 			"userId": "user123"
 		}'
 		2.response:
-		成功：{"data":{"Userid":"user123"},"errCode":0,"errMsg":"succ","requestId":"123456789"}
+		成功：{"data":{"userId":"user123"},"errCode":0,"errMsg":"succ","requestId":"123456789"}
 		失败：{"data":null,"errCode":10001,"errMsg":"para err","requestId":"123456789"}
 	*/
 }
