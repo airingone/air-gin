@@ -139,21 +139,21 @@ func Server(ctx *gin.Context) {
 	//读请求数据
 	reqBytes, err := ioutil.ReadAll(c.Ctx.Request.Body)
 	if err != nil {
-		log.Info("Server: Read http body data err, err: %+v", err)
+		log.Info("[GIN]: Server Read http body data err, err: %+v", err)
 		c.ResponseError(100, "Server:http read body err")
 		return
 	}
 	err = json.Unmarshal(reqBytes, &c.Req)
 	if err != nil {
-		log.Error("Server: Read http body data err, err: %+v", err)
+		log.Error("[GIN]: Server Read http body data err, err: %+v", err)
 		c.ResponseError(100, "Server:http body unmarshal err")
 		return
 	}
-	log.Info("Server: req: %+v", c.Req)
+	log.Info("[GIN]: Server req: %+v", c.Req)
 
 	//request id
 	if _, ok := c.Req["requestId"].(string); !ok {
-		log.Info("Server: requestId not exist, req: %+v", c.Req)
+		log.Info("[GIN]: Server requestId not exist, req: %+v", c.Req)
 		c.ResponseError(100, "Server:http body not have requestId err")
 		return
 	}
